@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive Page with Animations</title>
+  <style>
+    body,
+    html {
+      height: 100%;
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #ffffff;
+      overflow: hidden;
+    }
+
+    .screen {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      text-align: center;
+      position: relative;
+    }
+
+    h1,
+    h2,
+    p,
+    #image8 {
+      opacity: 0;
+      animation: fadeInDown 2s ease forwards;
+    }
+
+    #s6p2 {
+      animation-delay: 1s;
+    }
+
+    #s7p2 {
+      animation-delay: 1s;
+    }
+
+    #s7p3 {
+      animation-delay: 2s;
+    }
+
+    #s6h6 {
+      animation-delay: 2s;
+      position: absolute;
+      top: 12.5em;
+      left: 7em;
+      margin: 10px;
+      padding: 10px;
+    }
+
+    #s6h7 {
+      animation-delay: 3s;
+      position: absolute;
+      top: 257px;
+      right: 4.5em;
+      margin: 10px;
+      padding: 10px;
+    }
+
+    #s6h8 {
+      animation-delay: 4s;
+      position: absolute;
+      bottom: 5em;
+      left: 0em;
+      margin: 10px;
+      padding: 10px;
+    }
+
+    #s6h9 {
+      animation-delay: 5s;
+      position: absolute;
+      bottom: 13.3em;
+      right: 7em;
+      margin: 10px;
+      padding: 10px;
+    }
+
+    #s6h10 {
+      animation-delay: 6s;
+      position: absolute;
+      top: 66%;
+      left: 12%;
+      transform: translate(-50%, -50%);
+      margin: 10px;
+      padding: 10px;
+    }
+
+    #s6h11 {
+      animation-delay: 7s;
+      position: absolute;
+      top: 31%;
+      right: -1%;
+      transform: translate(50%, -50%);
+      margin: 10px;
+      padding: 10px;
+    }
+
+    #s6h12 {
+      animation-delay: 8s;
+      position: absolute;
+      bottom: 34%;
+      left: 0%;
+      transform: translate(-50%, 50%);
+      margin: 10px;
+      padding: 10px;
+    }
+
+    #s6h13 {
+      animation-delay: 9s;
+      position: absolute;
+      bottom: 19%;
+      right: 9%;
+      transform: translate(50%, 50%);
+      margin: 10px;
+      padding: 10px;
+    }
+
+    #s6h14 {
+      animation-delay: 10s;
+      position: absolute;
+      top: 14%;
+      left: 37%;
+      transform: translate(-50%, -50%);
+      margin: 10px;
+      padding: 10px;
+    }
+
+    #s6h15 {
+      animation-delay: 11s;
+      position: absolute;
+      top: 19%;
+      right: 16%;
+      transform: translate(50%, -50%);
+      margin: 10px;
+      padding: 10px;
+    }
+
+    @keyframes fadeOut {
+      0% {
+        opacity: 1;
+      }
+
+      100% {
+        opacity: 0;
+      }
+    }
+
+    #s8p1,
+    #s8p2,
+    #s8p3 {
+      animation: fadeOut 4s ease-in-out forwards;
+    }
+
+    #s8p2 {
+      animation-delay: 1s;
+    }
+
+    #s8p3 {
+      animation-delay: 2s;
+    }
+
+    #image8 {
+
+      animation-delay: 5s;
+    }
+
+    #s8p4 {
+      font-size: 6em;
+      animation-delay: 5s;
+      text-align: center;
+      transform: translateX(-50%);
+    }
+
+    #s9p1 {
+      animation-delay: 1s;
+    }
+
+    #s9p2 {
+      animation-delay: 2s;
+    }
+
+    #s9p3 {
+      animation-delay: 3s;
+    }
+
+    #s10p2 {
+      animation-delay: 1s;
+    }
+
+    h6 {
+      animation: scaleTextbigger 2s ease-in-out forwards;
+      opacity: 0;
+      transform: scale(0.5);
+    }
+
+    h5 {
+      animation: scaleTextsmaller 2s ease-in-out forwards;
+      opacity: 0;
+      transform: scale(0.5);
+    }
+
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes scaleTextsmaller {
+      from {
+        font-size: 8px;
+        opacity: 0;
+        transform: scale(0.5);
+      }
+
+      to {
+        font-size: 25px;
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    @keyframes scaleTextbigger {
+      from {
+        font-size: 8px;
+        opacity: 0;
+        transform: scale(0.5);
+      }
+
+      to {
+        font-size: 40px;
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .arrow {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      width: 50px;
+      cursor: pointer;
+      opacity: 0.7;
+      transition: opacity 0.3s ease;
+    }
+
+    .arrow:hover {
+      opacity: 1;
+    }
+
+    .arrow img {
+      width: 100%;
+    }
+
+    .images {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      pointer-events: none;
+    }
+
+    .images img {
+      width: 100px;
+      margin: 10px;
+      opacity: 0;
+      position: absolute;
+      animation: fadeIn 1s ease forwards, move 2s ease forwards;
+    }
+
+    #no {
+      min-width: 80px;
+      height: 50px;
+      font-size: 20px;
+      width: fit-content;
+    }
+
+    #yes {
+      min-width: 80px;
+      height: 50px;
+      font-size: 20px;
+      width: fit-content;
+    }
+
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes move {
+      0% {
+        transform: translateY(0) translateX(0);
+      }
+
+      100% {
+        transform: translateY(calc(var(--offsetY) * 1vh)) translateX(calc(var(--offsetX) * 1vw));
+      }
+    }
+
+    #gameCanvas {
+      border: 1px solid black;
+    }
+
+    .controls {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    button {
+      padding: 5px 10px;
+      font-size: 16px;
+    }
+
+    #countdown {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 24px;
+      color: red;
+    }
+
+    .options {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="screen" id="screen1">
+    <h1>Hallo，cgluWxh</h1>
+    <div class="arrow">
+      <img src="3.gif" alt="Scroll Down">
+    </div>
+  </div>
+
+  <div class="screen" id="screen2" style="display: none;">
+    <h2>这是我用ai完成的一个小页面</h2>
+    <div class="arrow">
+      <img src="3.gif" alt="Scroll Down">
+    </div>
+  </div>
+
+  <div class="screen" id="screen3" style="display: none;">
+    <p>算不算是一个阶段的教学成果验收呢<br>虽然是用ai写的QWQ</p>
+    <div class="images">
+      <!-- 图片将通过JavaScript动态添加 -->
+    </div>
+    <div class="arrow">
+      <img src="3.gif" alt="Scroll Down">
+    </div>
+  </div>
+
+  <div class="screen" id="screen4" style="display:none;">
+    <p>你说我要不要抒情（我老会抒情了^^）<br><button id="yes">yes</button>
+      <button id="no">no</button>
+    </p>
+  </div>
+
+  <div class="screen" id="screen5" style="display: none;">
+    <canvas id="gameCanvas" width="400" height="400"></canvas>
+    <div class="controls">
+      <button id="start">开始</button>
+      <button id="up">上</button>
+      <div style="display: flex; justify-content: center;">
+        <button id="left">左</button>
+        <button id="down">下</button>
+        <button id="right">右</button>
+      </div>
+    </div>
+    <div id="countdown"></div>
+    <div id="scoreboard">分数：<span id="score">0</span></div>
+    <div class="options">
+      <button id="restart">重新开始</button>
+      <button id="skip">算了，跳过</button>
+    </div>
+    <script>
+      const canvas = document.getElementById('gameCanvas');
+      const ctx = canvas.getContext('2d');
+      const countdownElement = document.getElementById('countdown');
+      const scoreElement = document.getElementById('score');
+      let snake = [{ x: 200, y: 200 }, { x: 180, y: 200 }, { x: 160, y: 200 }];
+      let direction = { x: 20, y: 0 };
+      let food = { x: 100, y: 100 };
+      let score = 0;
+      let intervalId;
+      let gameStarted = false;
+
+      function createFood() {
+        food = {
+          x: Math.floor(Math.random() * 20) * 20,
+          y: Math.floor(Math.random() * 20) * 20
+        };
+      }
+
+      function clearBoard() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+
+      function drawSnake() {
+        snake.forEach(part => {
+          ctx.fillStyle = 'green';
+          ctx.fillRect(part.x, part.y, 20, 20);
+        });
+      }
+
+      function drawFood() {
+        ctx.fillStyle = 'red';
+        ctx.fillRect(food.x, food.y, 20, 20);
+      }
+
+      function moveSnake() {
+        const head = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
+        snake.unshift(head);
+
+        if (head.x === food.x && head.y === food.y) {
+          score += 10;
+          scoreElement.textContent = score;
+          createFood();
+        } else {
+          snake.pop();
+        }
+
+        if (head.x < 0 || head.x > canvas.width - 20 || head.y < 0 || head.y > canvas.height - 20) {
+          endGame();
+        }
+
+        for (let i = 1; i < snake.length; i++) {
+          if (head.x === snake[i].x && head.y === snake[i].y) {
+            endGame();
+          }
+        }
+      }
+
+      function gameLoop() {
+        clearBoard();
+        drawFood();
+        drawSnake();
+        moveSnake();
+      }
+
+      function startGame() {
+        createFood();
+        gameStarted = true;
+        intervalId = setInterval(gameLoop, 100);
+      }
+
+      function endGame() {
+        clearInterval(intervalId);
+        const options = document.querySelector('.options');
+        options.style.display = 'flex';
+        if (score >= 100) {
+          document.getElementById('screen5').style.display = 'none';
+          document.getElementById('screen6').style.display = 'flex';
+        } else {
+          document.getElementById('screen5').style.display = 'none';
+        }
+      }
+
+      function startCountdown(time) {
+        countdownElement.textContent = `开始倒计时：${time}`;
+        if (time === 0) {
+          countdownElement.textContent = '';
+          startGame();
+          return;
+        }
+        setTimeout(() => startCountdown(time - 1), 1000);
+      }
+
+      document.getElementById('start').addEventListener('click', () => {
+        if (!gameStarted) {
+          startCountdown(3);
+        }
+      });
+
+      document.querySelectorAll('.controls button').forEach(button => {
+        button.addEventListener('click', () => {
+          const directions = ['up', 'left', 'down', 'right'];
+          if (directions.includes(button.id)) {
+            const newDirection = {'up': {x: 0, y: -20}, 'left': {x: -20, y: 0}, 'down': {x: 0, y: 20}, 'right': {x: 20, y: 0}}[button.id];
+            if (newDirection.x !== -direction.x || newDirection.y !== -direction.y) {
+              direction = newDirection;
+            }
+          }
+        });
+      });
+
+      document.getElementById('restart').addEventListener('click', () => {
+        location.reload();
+      });
+
+      document.getElementById('skip').addEventListener('click', () => {
+        document.getElementById('screen5').style.display = 'none';
+        document.getElementById('screen13').style.display = 'flex';
+      });
+    </script>
+  </div>
+  <div class="screen" id="screen6" style="display: none;">
+    <h1>有情有义嘛</h1>
+    <div class="arrow"> <img src="3.gif" alt="Scroll Down"> </div>
+  </div> <!-- ... 省略其他屏幕 ... -->
+  <div class="screen" id="screen7" style="display: none;">
+    <p>害，你别说，我到现在都觉得认识你挺不可思议的<br><b>这里你点慢点</b></p>
+    <p id="s6p2">认识你之后接触了特别多的新东西</p>
+    <h6 id="s6h6">pt</h6>
+    <h6 id="s6h7">ai</h6>
+    <h5 id="s6h8">（看到你们）建模</h5>
+    <h6 id="s6h9">html</h6>
+    <h5 id="s6h10">（看到你们）做动画</h5>
+    <h5 id="s6h11">3D打印<br>（虽然只是听你说）</h5>
+    <h6 id="s6h12">远程控制</h6>
+    <h6 id="s6h13">红外遥控</h6>
+    <h5 id="s6h14">了解了一丢丢服务器</h5>
+    <h5 id="s6h15">还嫖了你的服务器哈哈哈哈哈哈哈哈哈</h5>
+    <div class="arrow">
+      <img src="3.gif" alt="Scroll Down">
+    </div>
+  </div>
+  <div class="screen" id="screen8" style="display: none;">
+    <p>我有个特别喜欢的动漫角色<br><b>石神千空</b></p>
+    <img src="1.gif" alt="石神千空">
+    <p id="s7p2">绝对的科学家，让我看到了一个全新的科学的世界<br>你和他很像，引领我敲开了信息世界的大门</p>
+    <p id="s7p3">让我看到了一个如此广袤，充满无限可能的世界，这百分之一百亿的让人兴奋啊</p>
+    <div class="arrow">
+      <img src="3.gif" alt="Scroll Down">
+    </div>
+  </div>
+  <div class="screen" id="screen9" style="display: none;">
+    <p id="s8p1">每次看到你们那么厉害，我都觉得我应该要努力一点，再努力一点，有能力，有底气跟你们站在一起</p>
+    <p id="s8p2">好像扯远了</p>
+    <p id="s8p3">反正，*&……%%￥%&&*（……& 对吧,哈哈哈哈哈哈哈哈哈哈哈哈<br>这页还没结束呢，你慢点点</p>
+    <p id="s8p4"><b>！！！生日快乐啦！！！</b></p>
+    <img src="c.gif" alt="生日快乐" id="image8">
+
+    <div class="arrow">
+      <img src="3.gif" alt="Scroll Down">
+    </div>
+  </div>
+  <div class="screen" id="screen10" style="display: none;">
+    <p id="s9p0">礼物的话......</p>
+    <p id="s9p1">这次挑了本漫画书<br>但是可能会晚点到</p>
+    <p id="s9p2">作者是日本漫画家阿伏伽德六，一个内心很温柔的人，不知道这本书能不能引起你的共鸣</p>
+    <p id="s9p3">（害，我当时看......啊我忘了我当时看哭没哭了，但是还是蛮多感触的）</p>
+    <div class="arrow">
+      <img src="3.gif" alt="Scroll Down">
+    </div>
+  </div>
+
+  <div class="screen" id="screen11" style="display: none;">
+    <p id="s8p1">最后！最后！</p>
+    <p id="s8p2">祝你</p>
+    <p id="s8p3"><b>长命百岁！越来越厉害！</b></p>
+    <p id="s8p4">你要不要看我的代码呀，我感觉写的很冗长，能不能优化啊</p>
+    <img src="d.gif" alt="生日快乐" id="image8">
+  </div>
+
+  <div class="screen" id="screen12" style="display: none;">
+    <p>无情无义啧啧啧</p>
+    <div class="arrow">
+      <img src="3.gif" alt="Scroll Down">
+    </div>
+  </div>
+  <div class="screen" id="screen13" style="display: none;">
+    <p>好吧，那你错过了“生日快乐”</p>
+    <p id="s10p2">
+      然后我直接告诉你生日礼物吧，emmmm一本漫画书哈哈哈<br>但是可能要过几天才到<br>是一个日本作者，我在刚进高二的时候看的，又致郁又治愈的，（虽然我现在已经不记得内容了），<br>但是，这个作者内心一定是个很温柔的人，你也是，或许你们能共情呢
+    </p>
+    <div class="arrow"> <img src="3.gif" alt="Scroll Down"> </div>
+  </div>
+  <script> document.querySelectorAll('.arrow').forEach(button => {
+      button.addEventListener('click', function () {
+        const currentScreen = this.closest('.screen');
+        const nextScreen = currentScreen.nextElementSibling;
+        if (nextScreen) {
+          currentScreen.style.display = 'none';
+          nextScreen.style.display = 'flex';
+        }
+      });
+    });
+    document.querySelectorAll('#yes').forEach(button => {
+      button.addEventListener('click', function () {
+        const currentScreen = this.closest('.screen');
+        const nextScreen = currentScreen.nextElementSibling;
+        if (nextScreen) {
+          currentScreen.style.display = 'none';
+          nextScreen.style.display = 'flex';
+        } console.log("点击了yes");
+      });
+    });
+    let screen12 = document.getElementById('screen12');
+    document.querySelectorAll('#no').forEach(button => {
+      button.addEventListener('click', function () {
+        const currentScreen = this.closest('.screen');
+        const nextScreen = screen12;
+        if (nextScreen) {
+          currentScreen.style.display = 'none';
+          nextScreen.style.display = 'flex';
+        }
+        console.log("点击了no");
+      });
+    }); 
+  </script>
+</body>
+
+</html>

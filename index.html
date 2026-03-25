@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>贪吃蛇游戏</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        canvas {
+            border: 1px solid black;
+        }
+        .controls {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        button {
+            padding: 5px 10px;
+            font-size: 16px;
+        }
+        #countdown {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 24px;
+            color: red;
+            display: none; /* Initially hide the countdown */
+        }
+        #startReminder {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px;
+            background: white;
+            border: 1px solid black;
+            z-index: 10;
+            text-align: center;
+        }
+        #gameOverDialog, #skipDialog {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px;
+            background: white;
+            border: 1px solid black;
+            z-index: 10;
+            text-align: center;
+        }
+        .dialog button {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas" width="400" height="400"></canvas>
+    <div class="controls">
+        <button id="up">上</button>
+        <div>
+            <button id="left">左</button>
+            <button id="down">下</button>
+            <button id="right">右</button>
+        </div>
+    </div>
+    <div id="startReminder">
+        <p>游戏马上开始，拿到100分才能走“yes”路径哦</p>
+        <button onclick="startCountdown()">开始游戏</button>
+    </div>
+    <div id="countdown"></div>
+    <div id="gameOverDialog">
+        <p>游戏结束，分数：<span id="finalScore"></span></p>
+        <button onclick="restartGame()">手滑了，再来</button>
+    </div>
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const countdownElement = document.getElementById('countdown');
+        const startReminder = document.getElementById('startReminder');
+        const gameOverDialog = document.getElementById('gameOverDialog');
+        const finalScore = document.getElementById('finalScore');
+        const controls = document.querySelectorAll('.controls button');
+        let snake = [{ x: 200, y: 200 }, { x: 180, y: 200 }, { x: 160, y: 200 }];
+        let direction = { x: 20, y: 0 }; // 初始方向向右
+        let food = { x: 100, y: 100 };
+        let score = 0;
+        let intervalId;
+
+        function createFood() {
+            food = {
+                x: Math.floor(Math.random() * 20) * 20,
+                y: Math.floor(Math.random() * 20) * 20
+            };
+        }
+
+        function clearBoard() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function drawSnake() {
+            snake.forEach(part => {
+                ctx.fillStyle = 'green';
+                ctx.fillRect(part.x, part.y, 20, 20);
+            });
+        }
+
+        function drawFood() {
+            ctx.fillStyle = 'red';
+            ctx.fillRect(food.x, food.y, 20, 20);
+        }
+
+        function moveSnake() {
+            const head = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
+            snake.unshift(head);
+
+            if (head.x === food.x && head.y === food.y) {
+                score += 10;
+                createFood();
+            } else {
+                snake.pop();
+            }
+
+            if (head.x < 0 || head.x > canvas.width - 20 || head.y < 0 || head.y > canvas.height - 20 || snake.length > 20) {
+                endGame();
+            }
+
+            for (let i = 1; i < snake.length; i++) {
+                if (head.x === snake[i].x && head.y === snake[i].y) {
+                    endGame();
+                }
+            }
+        }
+
+        function gameLoop() {
+            clearBoard();
+            drawFood();
+            drawSnake();
+            moveSnake();
+        }
+
+        function startGame() {
+            createFood();
+            intervalId = setInterval(gameLoop, 100);
+            startReminder.style.display = 'none'; // Hide start reminder
+            countdownElement.style.display = 'none'; // Hide countdown after game starts
+        }
+
+        function updateCountdown(time) {
+            countdownElement.textContent = `开始倒计时：${time}`;
+            countdownElement.style.display = 'block'; // Show countdown
+            if (time === 0) {
+                startGame();
+                return;
+            }
+            setTimeout(() => updateCountdown(time - 1), 1000);
+        }
+
+        function startCountdown() {
+            startReminder.style.display = 'none'; // Hide start reminder when countdown starts
+            updateCountdown(3); // Start 3-second countdown
+        }
+
+        controls.forEach((button, index) => {
+            button.addEventListener('click', () => {
+                const directions = ['up', 'left', 'down', 'right'];
+                if (directions.includes(button.id)) {
+                    const newDirection = {'up': {x: 0, y: -20}, 'left': {x: -20, y: 0}, 'down': {x: 0, y: 20}, 'right': {x: 20, y: 0}}[button.id];
+                    if (newDirection.x !== -direction.x || newDirection.y !== -direction.y) {
+                        direction = newDirection;
+                    }
+                }
+            });
+        });
+
+        document.addEventListener('keydown', (e) => {
+            switch (e.key) {
+                case 'ArrowUp':
+                    if (direction.y === 0) direction = { x: 0, y: -20 };
+                    break;
+                case 'ArrowDown':
+                    if (direction.y === 0) direction = { x: 0, y: 20 };
+                    break;
+                case 'ArrowLeft':
+                    if (direction.x === 0) direction = { x: -20, y: 0 };
+                    break;
+                case 'ArrowRight':
+                    if (direction.x === 0) direction = { x: 20, y: 0 };
+                    break;
+            }
+        });
+
+        function endGame() {
+            clearInterval(intervalId);
+            finalScore.textContent = score;
+            if (score < 100) {
+                gameOverDialog.style.display = 'block'; // Show game over dialog if score is less than 100
+            } else {
+                document.getElementById('screen5').style.display = 'none'; // Hide current screen
+                document.getElementById('screen6').style.display = 'flex'; // Show next screen
+            }
+            countdownElement.style.display = 'none'; // Hide countdown after game ends
+        }
+
+        function restartGame() {
+            gameOverDialog.style.display = 'none'; // Hide game over dialog
+            location.reload();
+        }
+    </script>
+</body>
+</html>

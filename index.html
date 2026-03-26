@@ -1,223 +1,903 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>贪吃蛇游戏</title>
-    <style>
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f0f0f0;
-        }
-        canvas {
-            border: 1px solid black;
-        }
-        .controls {
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-        }
-        button {
-            padding: 5px 10px;
-            font-size: 16px;
-        }
-        #countdown {
-            position: absolute;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 24px;
-            color: red;
-            display: none; /* Initially hide the countdown */
-        }
-        #startReminder {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            padding: 20px;
-            background: white;
-            border: 1px solid black;
-            z-index: 10;
-            text-align: center;
-        }
-        #gameOverDialog, #skipDialog {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            padding: 20px;
-            background: white;
-            border: 1px solid black;
-            z-index: 10;
-            text-align: center;
-        }
-        .dialog button {
-            margin-top: 10px;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portfolio — Your Name</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #F2EDE4;
+    --ink: #1C1C1C;
+    --ink-light: #5A5550;
+    --accent: #C4784A;
+    --accent-pale: #EDD9C8;
+    --white: #FAFAF7;
+    --border: rgba(28,28,28,0.12);
+    --mono: 'DM Mono', monospace;
+    --serif: 'Cormorant Garamond', serif;
+    --sans: 'DM Sans', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--cream);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-weight: 300;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* Custom Cursor */
+  .cursor {
+    position: fixed; top: 0; left: 0; z-index: 9999;
+    pointer-events: none;
+  }
+  .cursor-dot {
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s;
+  }
+  .cursor-ring {
+    position: fixed; top: 0; left: 0; z-index: 9998;
+    width: 36px; height: 36px;
+    border: 1px solid var(--ink);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    transition: transform 0.18s ease, width 0.3s ease, height 0.3s ease, border-color 0.3s ease;
+  }
+  .cursor-ring.hovered {
+    width: 56px; height: 56px;
+    border-color: var(--accent);
+  }
+
+  /* Nav */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 24px 48px;
+    mix-blend-mode: multiply;
+  }
+  .nav-logo {
+    font-family: var(--serif);
+    font-size: 1.1rem;
+    font-style: italic;
+    letter-spacing: 0.02em;
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .nav-links {
+    display: flex; gap: 36px; list-style: none;
+  }
+  .nav-links a {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink);
+    text-decoration: none;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+  }
+  .nav-links a:hover { opacity: 1; }
+
+  /* Hero */
+  .hero {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-left {
+    display: flex; flex-direction: column; justify-content: flex-end;
+    padding: 120px 48px 80px;
+    position: relative;
+    z-index: 2;
+  }
+  .hero-tag {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 24px;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.2s forwards;
+  }
+  .hero-name {
+    font-family: var(--serif);
+    font-size: clamp(4rem, 8vw, 9rem);
+    font-weight: 300;
+    line-height: 0.92;
+    letter-spacing: -0.02em;
+    opacity: 0;
+    animation: fadeUp 0.9s 0.4s forwards;
+  }
+  .hero-name em {
+    font-style: italic;
+    color: var(--accent);
+  }
+  .hero-desc {
+    margin-top: 40px;
+    max-width: 360px;
+    font-size: 0.95rem;
+    line-height: 1.75;
+    color: var(--ink-light);
+    opacity: 0;
+    animation: fadeUp 0.9s 0.6s forwards;
+  }
+  .hero-cta {
+    margin-top: 48px;
+    display: flex; gap: 20px; align-items: center;
+    opacity: 0;
+    animation: fadeUp 0.9s 0.8s forwards;
+  }
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: var(--ink);
+    color: var(--cream);
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 14px 28px;
+    text-decoration: none;
+    transition: background 0.3s, color 0.3s;
+  }
+  .btn-primary:hover { background: var(--accent); }
+  .btn-secondary {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-light);
+    text-decoration: none;
+    border-bottom: 1px solid currentColor;
+    padding-bottom: 2px;
+    transition: color 0.2s;
+  }
+  .btn-secondary:hover { color: var(--accent); }
+
+  .hero-right {
+    position: relative;
+    background: var(--ink);
+    overflow: hidden;
+  }
+  .hero-image-placeholder {
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column;
+    gap: 16px;
+    color: rgba(255,255,255,0.15);
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+  }
+  .hero-image-placeholder svg {
+    width: 48px; height: 48px;
+    stroke: rgba(255,255,255,0.1);
+  }
+  .hero-image-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, var(--accent) 0%, transparent 60%);
+    opacity: 0.15;
+    mix-blend-mode: screen;
+  }
+  .hero-number {
+    position: absolute; bottom: 48px; right: 48px;
+    font-family: var(--serif);
+    font-size: 12rem;
+    font-weight: 300;
+    color: rgba(255,255,255,0.04);
+    line-height: 1;
+    user-select: none;
+  }
+  .scroll-hint {
+    position: absolute; bottom: 40px; left: 48px;
+    display: flex; align-items: center; gap: 12px;
+    font-family: var(--mono); font-size: 0.65rem;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--ink-light);
+    opacity: 0;
+    animation: fadeIn 1s 1.4s forwards;
+  }
+  .scroll-line {
+    width: 40px; height: 1px;
+    background: var(--accent);
+    position: relative; overflow: hidden;
+  }
+  .scroll-line::after {
+    content: '';
+    position: absolute; top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: var(--ink);
+    animation: scrollAnim 2s 1.4s infinite;
+  }
+
+  /* Section styles */
+  section { padding: 120px 48px; }
+  .section-header {
+    display: flex; align-items: baseline; gap: 20px;
+    margin-bottom: 72px;
+  }
+  .section-number {
+    font-family: var(--mono); font-size: 0.65rem;
+    letter-spacing: 0.15em; color: var(--accent);
+  }
+  .section-title {
+    font-family: var(--serif);
+    font-size: clamp(2.5rem, 4vw, 4rem);
+    font-weight: 300;
+    line-height: 1.05;
+  }
+  .section-title em { font-style: italic; color: var(--accent); }
+
+  /* Portfolio Grid */
+  #works { background: var(--white); }
+  .works-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 2px;
+  }
+  .work-item {
+    position: relative;
+    overflow: hidden;
+    background: var(--cream);
+    cursor: none;
+  }
+  .work-item:nth-child(1) { grid-column: 1 / 8; grid-row: 1; }
+  .work-item:nth-child(2) { grid-column: 8 / 13; grid-row: 1; }
+  .work-item:nth-child(3) { grid-column: 1 / 5; grid-row: 2; }
+  .work-item:nth-child(4) { grid-column: 5 / 10; grid-row: 2; }
+  .work-item:nth-child(5) { grid-column: 10 / 13; grid-row: 2; }
+  .work-item:nth-child(6) { grid-column: 1 / 13; grid-row: 3; }
+
+  .work-img {
+    width: 100%;
+    aspect-ratio: 4/3;
+    background: var(--ink);
+    position: relative;
+    overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+    transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+  .work-item:nth-child(1) .work-img { aspect-ratio: 16/10; }
+  .work-item:nth-child(6) .work-img { aspect-ratio: 21/9; }
+
+  .work-img-placeholder {
+    width: 100%; height: 100%;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 12px;
+    color: rgba(255,255,255,0.12);
+    font-family: var(--mono); font-size: 0.65rem;
+    letter-spacing: 0.1em;
+  }
+  .work-img-bg {
+    position: absolute; inset: 0;
+    opacity: 0.6;
+  }
+
+  /* Unique background colors for each work */
+  .work-item:nth-child(1) .work-img { background: #2A2420; }
+  .work-item:nth-child(2) .work-img { background: #1E2430; }
+  .work-item:nth-child(3) .work-img { background: #2B2418; }
+  .work-item:nth-child(4) .work-img { background: #221E2E; }
+  .work-item:nth-child(5) .work-img { background: #1A2820; }
+  .work-item:nth-child(6) .work-img { background: #281C1A; }
+
+  .work-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 50%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    display: flex; flex-direction: column; justify-content: flex-end;
+    padding: 28px;
+  }
+  .work-item:hover .work-overlay { opacity: 1; }
+  .work-item:hover .work-img { transform: scale(1.04); }
+
+  .work-cat {
+    font-family: var(--mono); font-size: 0.6rem;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 6px;
+  }
+  .work-title {
+    font-family: var(--serif); font-size: 1.5rem;
+    font-weight: 300; color: white; line-height: 1.2;
+  }
+  .work-year {
+    font-family: var(--mono); font-size: 0.65rem;
+    color: rgba(255,255,255,0.5); margin-top: 8px;
+  }
+  .work-arrow {
+    position: absolute; top: 20px; right: 20px;
+    width: 36px; height: 36px;
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 0.8rem;
+    transform: rotate(-45deg);
+    transition: background 0.3s, border-color 0.3s;
+  }
+  .work-item:hover .work-arrow {
+    background: var(--accent); border-color: var(--accent);
+  }
+
+  /* Upload zone — subtle indicator */
+  .upload-hint {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+    text-align: center;
+    z-index: 5;
+  }
+  .upload-hint svg { width: 28px; height: 28px; stroke: rgba(255,255,255,0.2); margin-bottom: 8px; }
+  .upload-hint p { font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.1em; color: rgba(255,255,255,0.18); }
+
+  /* About */
+  #about {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 80px;
+    align-items: start;
+  }
+  .about-left {}
+  .about-portrait {
+    width: 100%; aspect-ratio: 3/4;
+    background: var(--ink);
+    position: relative; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .about-portrait-placeholder {
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+    color: rgba(255,255,255,0.12); font-family: var(--mono); font-size: 0.65rem;
+    letter-spacing: 0.1em;
+  }
+  .about-portrait-frame {
+    position: absolute; bottom: -20px; right: -20px;
+    width: 60%; height: 60%;
+    border: 1px solid var(--accent);
+    opacity: 0.25;
+  }
+  .about-right {
+    padding-top: 20px;
+  }
+  .about-body {
+    font-size: 1.05rem; line-height: 1.85;
+    color: var(--ink-light);
+    margin-bottom: 36px;
+  }
+  .about-body strong { color: var(--ink); font-weight: 400; }
+  .stats-row {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 2px; margin: 48px 0;
+  }
+  .stat {
+    padding: 24px 20px;
+    background: var(--white);
+    text-align: center;
+  }
+  .stat-num {
+    font-family: var(--serif); font-size: 3rem;
+    font-weight: 300; color: var(--accent);
+    display: block; line-height: 1;
+  }
+  .stat-label {
+    font-family: var(--mono); font-size: 0.6rem;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--ink-light); margin-top: 8px; display: block;
+  }
+  .skills-list {
+    display: flex; flex-wrap: wrap; gap: 8px; margin-top: 32px;
+  }
+  .skill-tag {
+    font-family: var(--mono); font-size: 0.65rem;
+    letter-spacing: 0.08em;
+    border: 1px solid var(--border);
+    padding: 6px 14px;
+    color: var(--ink-light);
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .skill-tag:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* Statement */
+  #statement {
+    background: var(--ink); color: var(--cream);
+    text-align: center; padding: 120px 80px;
+  }
+  .statement-label {
+    font-family: var(--mono); font-size: 0.65rem;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 48px;
+  }
+  .statement-text {
+    font-family: var(--serif);
+    font-size: clamp(1.8rem, 3.5vw, 3.2rem);
+    font-weight: 300; line-height: 1.45;
+    max-width: 900px; margin: 0 auto;
+    color: var(--cream);
+  }
+  .statement-text em { font-style: italic; color: var(--accent); }
+  .statement-sig {
+    margin-top: 60px;
+    font-family: var(--serif); font-style: italic;
+    font-size: 1.5rem; color: rgba(242,237,228,0.4);
+  }
+
+  /* Contact */
+  #contact {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 80px;
+    align-items: start;
+  }
+  .contact-left {}
+  .contact-email {
+    display: block;
+    font-family: var(--serif);
+    font-size: clamp(1.4rem, 2.5vw, 2.2rem);
+    font-weight: 300; font-style: italic;
+    color: var(--ink);
+    text-decoration: none;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 16px;
+    margin: 32px 0;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .contact-email:hover { color: var(--accent); border-color: var(--accent); }
+  .social-links {
+    display: flex; gap: 24px; margin-top: 24px;
+  }
+  .social-link {
+    font-family: var(--mono); font-size: 0.65rem;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--ink-light); text-decoration: none;
+    display: flex; align-items: center; gap: 8px;
+    transition: color 0.2s;
+  }
+  .social-link:hover { color: var(--accent); }
+  .social-link::before {
+    content: '→';
+    font-size: 0.8rem;
+  }
+  .contact-right {}
+  .contact-form { display: flex; flex-direction: column; gap: 24px; }
+  .form-group { display: flex; flex-direction: column; gap: 8px; }
+  .form-label {
+    font-family: var(--mono); font-size: 0.62rem;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--ink-light);
+  }
+  .form-input, .form-textarea {
+    background: transparent;
+    border: none; border-bottom: 1px solid var(--border);
+    padding: 12px 0; font-family: var(--sans);
+    font-size: 0.95rem; color: var(--ink);
+    outline: none; transition: border-color 0.2s;
+    font-weight: 300;
+  }
+  .form-input:focus, .form-textarea:focus { border-color: var(--accent); }
+  .form-textarea { resize: none; height: 100px; }
+  .form-submit {
+    align-self: flex-start;
+    background: var(--ink); color: var(--cream);
+    border: none; padding: 14px 32px;
+    font-family: var(--mono); font-size: 0.7rem;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    cursor: none; transition: background 0.3s;
+  }
+  .form-submit:hover { background: var(--accent); }
+
+  /* Footer */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 32px 48px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .footer-copy {
+    font-family: var(--mono); font-size: 0.62rem;
+    letter-spacing: 0.1em; color: var(--ink-light);
+  }
+  .footer-back {
+    font-family: var(--mono); font-size: 0.62rem;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--ink-light); text-decoration: none;
+    display: flex; align-items: center; gap: 8px;
+    transition: color 0.2s;
+  }
+  .footer-back:hover { color: var(--accent); }
+  .footer-back::after { content: '↑'; }
+
+  /* Decorative lines */
+  .deco-line {
+    width: 1px; height: 80px;
+    background: linear-gradient(to bottom, transparent, var(--accent), transparent);
+    margin: 0 auto 40px;
+  }
+
+  /* Animations */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; } to { opacity: 1; }
+  }
+  @keyframes scrollAnim {
+    0% { left: -100%; }
+    50% { left: 0%; }
+    100% { left: 100%; }
+  }
+
+  /* Reveal on scroll */
+  .reveal {
+    opacity: 0; transform: translateY(32px);
+    transition: opacity 0.9s ease, transform 0.9s ease;
+  }
+  .reveal.visible {
+    opacity: 1; transform: translateY(0);
+  }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    nav { padding: 20px 24px; }
+    section { padding: 80px 24px; }
+    .hero { grid-template-columns: 1fr; }
+    .hero-right { display: none; }
+    .hero-left { padding: 120px 24px 80px; }
+    .works-grid { grid-template-columns: 1fr 1fr; }
+    .work-item { grid-column: auto !important; grid-row: auto !important; }
+    #about { grid-template-columns: 1fr; }
+    #contact { grid-template-columns: 1fr; }
+    footer { flex-direction: column; gap: 16px; text-align: center; }
+    .scroll-hint { display: none; }
+  }
+</style>
 </head>
 <body>
-    <canvas id="gameCanvas" width="400" height="400"></canvas>
-    <div class="controls">
-        <button id="up">上</button>
-        <div>
-            <button id="left">左</button>
-            <button id="down">下</button>
-            <button id="right">右</button>
+
+<!-- Cursor -->
+<div class="cursor" id="cursorDot"><div class="cursor-dot"></div></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- Nav -->
+<nav>
+  <a href="#" class="nav-logo">Your Name</a>
+  <ul class="nav-links">
+    <li><a href="#works">Works</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#statement">Statement</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-left">
+    <p class="hero-tag">Portfolio 2024 — Art School Application</p>
+    <h1 class="hero-name">Your<br><em>Name.</em></h1>
+    <p class="hero-desc">A multidisciplinary artist working at the intersection of visual narrative, material exploration, and digital experience. Based in [City].</p>
+    <div class="hero-cta">
+      <a href="#works" class="btn-primary">
+        <span>View Works</span>
+        <span>→</span>
+      </a>
+      <a href="#contact" class="btn-secondary">Get in Touch</a>
+    </div>
+    <div class="scroll-hint">
+      <div class="scroll-line"></div>
+      <span>Scroll to explore</span>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="hero-image-placeholder">
+      <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="8" y="8" width="32" height="32" rx="1" stroke-width="1"/>
+        <circle cx="18" cy="19" r="4" stroke-width="1"/>
+        <path d="M8 33 L18 23 L26 31 L32 25 L40 33" stroke-width="1"/>
+      </svg>
+      <span>Feature Image</span>
+    </div>
+    <div class="hero-image-overlay"></div>
+    <div class="hero-number">01</div>
+  </div>
+</section>
+
+<!-- Works -->
+<section id="works">
+  <div class="section-header reveal">
+    <span class="section-number">01</span>
+    <h2 class="section-title">Selected<br><em>Works</em></h2>
+  </div>
+
+  <div class="works-grid reveal">
+    <!-- Work 1 -->
+    <div class="work-item">
+      <div class="work-img">
+        <div class="work-img-placeholder">
+          <svg width="36" height="36" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" style="stroke:rgba(255,255,255,0.15)">
+            <rect x="8" y="8" width="32" height="32" rx="1" stroke-width="1"/>
+            <circle cx="18" cy="19" r="4" stroke-width="1"/>
+            <path d="M8 33 L18 23 L26 31 L32 25 L40 33" stroke-width="1"/>
+          </svg>
+          <p>Upload your artwork</p>
         </div>
+        <div class="work-overlay">
+          <div class="work-cat">Painting / 2024</div>
+          <div class="work-title">Work Title One</div>
+          <div class="work-year">Acrylic on canvas, 120 × 90 cm</div>
+        </div>
+        <div class="work-arrow">↗</div>
+      </div>
     </div>
-    <div id="startReminder">
-        <p>游戏马上开始，拿到100分才能走“yes”路径哦</p>
-        <button onclick="startCountdown()">开始游戏</button>
+
+    <!-- Work 2 -->
+    <div class="work-item">
+      <div class="work-img">
+        <div class="work-img-placeholder">
+          <svg width="28" height="28" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" style="stroke:rgba(255,255,255,0.15)">
+            <rect x="8" y="8" width="32" height="32" rx="1" stroke-width="1"/>
+            <circle cx="18" cy="19" r="4" stroke-width="1"/>
+            <path d="M8 33 L18 23 L26 31 L32 25 L40 33" stroke-width="1"/>
+          </svg>
+          <p>Upload your artwork</p>
+        </div>
+        <div class="work-overlay">
+          <div class="work-cat">Photography / 2024</div>
+          <div class="work-title">Work Title Two</div>
+          <div class="work-year">Digital photography series</div>
+        </div>
+        <div class="work-arrow">↗</div>
+      </div>
     </div>
-    <div id="countdown"></div>
-    <div id="gameOverDialog">
-        <p>游戏结束，分数：<span id="finalScore"></span></p>
-        <button onclick="restartGame()">手滑了，再来</button>
+
+    <!-- Work 3 -->
+    <div class="work-item">
+      <div class="work-img">
+        <div class="work-img-placeholder">
+          <svg width="24" height="24" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" style="stroke:rgba(255,255,255,0.15)">
+            <rect x="8" y="8" width="32" height="32" rx="1" stroke-width="1"/>
+            <circle cx="18" cy="19" r="4" stroke-width="1"/>
+            <path d="M8 33 L18 23 L26 31 L32 25 L40 33" stroke-width="1"/>
+          </svg>
+          <p>Upload your artwork</p>
+        </div>
+        <div class="work-overlay">
+          <div class="work-cat">Sculpture / 2023</div>
+          <div class="work-title">Work Title Three</div>
+          <div class="work-year">Mixed media installation</div>
+        </div>
+        <div class="work-arrow">↗</div>
+      </div>
     </div>
-    <script>
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
-        const countdownElement = document.getElementById('countdown');
-        const startReminder = document.getElementById('startReminder');
-        const gameOverDialog = document.getElementById('gameOverDialog');
-        const finalScore = document.getElementById('finalScore');
-        const controls = document.querySelectorAll('.controls button');
-        let snake = [{ x: 200, y: 200 }, { x: 180, y: 200 }, { x: 160, y: 200 }];
-        let direction = { x: 20, y: 0 }; // 初始方向向右
-        let food = { x: 100, y: 100 };
-        let score = 0;
-        let intervalId;
 
-        function createFood() {
-            food = {
-                x: Math.floor(Math.random() * 20) * 20,
-                y: Math.floor(Math.random() * 20) * 20
-            };
-        }
+    <!-- Work 4 -->
+    <div class="work-item">
+      <div class="work-img">
+        <div class="work-img-placeholder">
+          <svg width="28" height="28" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" style="stroke:rgba(255,255,255,0.15)">
+            <rect x="8" y="8" width="32" height="32" rx="1" stroke-width="1"/>
+            <circle cx="18" cy="19" r="4" stroke-width="1"/>
+            <path d="M8 33 L18 23 L26 31 L32 25 L40 33" stroke-width="1"/>
+          </svg>
+          <p>Upload your artwork</p>
+        </div>
+        <div class="work-overlay">
+          <div class="work-cat">Drawing / 2023</div>
+          <div class="work-title">Work Title Four</div>
+          <div class="work-year">Charcoal on paper, 80 × 60 cm</div>
+        </div>
+        <div class="work-arrow">↗</div>
+      </div>
+    </div>
 
-        function clearBoard() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-        }
+    <!-- Work 5 -->
+    <div class="work-item">
+      <div class="work-img">
+        <div class="work-img-placeholder">
+          <svg width="22" height="22" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" style="stroke:rgba(255,255,255,0.15)">
+            <rect x="8" y="8" width="32" height="32" rx="1" stroke-width="1"/>
+            <circle cx="18" cy="19" r="4" stroke-width="1"/>
+            <path d="M8 33 L18 23 L26 31 L32 25 L40 33" stroke-width="1"/>
+          </svg>
+          <p>Upload your artwork</p>
+        </div>
+        <div class="work-overlay">
+          <div class="work-cat">Digital / 2023</div>
+          <div class="work-title">Work Title Five</div>
+          <div class="work-year">Generative art, variable dimensions</div>
+        </div>
+        <div class="work-arrow">↗</div>
+      </div>
+    </div>
 
-        function drawSnake() {
-            snake.forEach(part => {
-                ctx.fillStyle = 'green';
-                ctx.fillRect(part.x, part.y, 20, 20);
-            });
-        }
+    <!-- Work 6 — Full width -->
+    <div class="work-item">
+      <div class="work-img">
+        <div class="work-img-placeholder">
+          <svg width="36" height="36" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" style="stroke:rgba(255,255,255,0.15)">
+            <rect x="8" y="8" width="32" height="32" rx="1" stroke-width="1"/>
+            <circle cx="18" cy="19" r="4" stroke-width="1"/>
+            <path d="M8 33 L18 23 L26 31 L32 25 L40 33" stroke-width="1"/>
+          </svg>
+          <p>Upload your featured work</p>
+        </div>
+        <div class="work-overlay">
+          <div class="work-cat">Installation / 2023 — Featured Work</div>
+          <div class="work-title">Work Title Six — Your Magnum Opus</div>
+          <div class="work-year">Site-specific installation, dimensions variable</div>
+        </div>
+        <div class="work-arrow">↗</div>
+      </div>
+    </div>
+  </div>
+</section>
 
-        function drawFood() {
-            ctx.fillStyle = 'red';
-            ctx.fillRect(food.x, food.y, 20, 20);
-        }
+<!-- About -->
+<section id="about">
+  <div class="about-left reveal">
+    <div class="about-portrait">
+      <div class="about-portrait-placeholder">
+        <svg width="40" height="40" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" style="stroke:rgba(255,255,255,0.15);stroke-width:1">
+          <circle cx="24" cy="18" r="8"/>
+          <path d="M8 42 C8 34 14 28 24 28 C34 28 40 34 40 42"/>
+        </svg>
+        <p style="font-family:var(--mono);font-size:0.62rem;letter-spacing:0.1em;color:rgba(255,255,255,0.15)">Your Portrait</p>
+      </div>
+      <div class="about-portrait-frame"></div>
+    </div>
+  </div>
+  <div class="about-right reveal">
+    <div class="section-header" style="margin-bottom: 40px;">
+      <span class="section-number">02</span>
+      <h2 class="section-title">About<br><em>Me</em></h2>
+    </div>
+    <p class="about-body">
+      My name is <strong>Your Name</strong>, and I am a multidisciplinary artist currently based in [City]. My practice spans painting, photography, and installation — each work an attempt to navigate the tension between <strong>memory and materiality</strong>.
+    </p>
+    <p class="about-body">
+      Growing up between cultures has deeply informed my visual language. I am drawn to liminal spaces — the threshold between belonging and estrangement — and I explore these through <strong>layered surfaces, fragmented forms</strong>, and the quiet persistence of everyday objects.
+    </p>
+    <div class="stats-row">
+      <div class="stat">
+        <span class="stat-num">12+</span>
+        <span class="stat-label">Works</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num">3</span>
+        <span class="stat-label">Exhibitions</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num">5</span>
+        <span class="stat-label">Years</span>
+      </div>
+    </div>
+    <div class="skills-list">
+      <span class="skill-tag">Oil Painting</span>
+      <span class="skill-tag">Photography</span>
+      <span class="skill-tag">Printmaking</span>
+      <span class="skill-tag">Installation</span>
+      <span class="skill-tag">Drawing</span>
+      <span class="skill-tag">Ceramics</span>
+      <span class="skill-tag">Digital Media</span>
+    </div>
+  </div>
+</section>
 
-        function moveSnake() {
-            const head = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
-            snake.unshift(head);
+<!-- Statement -->
+<section id="statement">
+  <div class="deco-line"></div>
+  <p class="statement-label">Artist Statement</p>
+  <blockquote class="statement-text">
+    "I make work because I need to <em>understand</em> — not the world in its totality, but the small, stubborn fragments that refuse to be translated into language. Each piece begins as a question I cannot yet articulate."
+  </blockquote>
+  <p class="statement-sig">— Your Name, 2024</p>
+</section>
 
-            if (head.x === food.x && head.y === food.y) {
-                score += 10;
-                createFood();
-            } else {
-                snake.pop();
-            }
+<!-- Contact -->
+<section id="contact">
+  <div class="contact-left reveal">
+    <div class="section-header" style="margin-bottom: 40px;">
+      <span class="section-number">03</span>
+      <h2 class="section-title">Get in<br><em>Touch</em></h2>
+    </div>
+    <p style="font-size:0.95rem; line-height:1.75; color:var(--ink-light); max-width: 320px;">
+      For application inquiries, collaboration proposals, or general correspondence, feel free to reach out.
+    </p>
+    <a href="mailto:your@email.com" class="contact-email">your@email.com</a>
+    <div class="social-links">
+      <a href="#" class="social-link">Instagram</a>
+      <a href="#" class="social-link">Behance</a>
+      <a href="#" class="social-link">LinkedIn</a>
+    </div>
+  </div>
+  <div class="contact-right reveal">
+    <div class="contact-form">
+      <div class="form-group">
+        <label class="form-label">Name</label>
+        <input type="text" class="form-input" placeholder="Your full name">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input type="email" class="form-input" placeholder="your@email.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Message</label>
+        <textarea class="form-textarea" placeholder="Your message..."></textarea>
+      </div>
+      <button class="form-submit">Send Message</button>
+    </div>
+  </div>
+</section>
 
-            if (head.x < 0 || head.x > canvas.width - 20 || head.y < 0 || head.y > canvas.height - 20 || snake.length > 20) {
-                endGame();
-            }
+<!-- Footer -->
+<footer>
+  <p class="footer-copy">© 2024 Your Name. All rights reserved.</p>
+  <a href="#" class="footer-back">Back to top</a>
+</footer>
 
-            for (let i = 1; i < snake.length; i++) {
-                if (head.x === snake[i].x && head.y === snake[i].y) {
-                    endGame();
-                }
-            }
-        }
+<script>
+  // Custom cursor
+  const dot = document.getElementById('cursorDot').querySelector('.cursor-dot');
+  const ring = document.getElementById('cursorRing');
+  let mouseX = 0, mouseY = 0, ringX = 0, ringY = 0;
 
-        function gameLoop() {
-            clearBoard();
-            drawFood();
-            drawSnake();
-            moveSnake();
-        }
+  document.addEventListener('mousemove', e => {
+    mouseX = e.clientX; mouseY = e.clientY;
+    dot.style.left = mouseX + 'px';
+    dot.style.top = mouseY + 'px';
+  });
 
-        function startGame() {
-            createFood();
-            intervalId = setInterval(gameLoop, 100);
-            startReminder.style.display = 'none'; // Hide start reminder
-            countdownElement.style.display = 'none'; // Hide countdown after game starts
-        }
+  const hoverables = document.querySelectorAll('a, button, .work-item, .skill-tag');
+  hoverables.forEach(el => {
+    el.addEventListener('mouseenter', () => ring.classList.add('hovered'));
+    el.addEventListener('mouseleave', () => ring.classList.remove('hovered'));
+  });
 
-        function updateCountdown(time) {
-            countdownElement.textContent = `开始倒计时：${time}`;
-            countdownElement.style.display = 'block'; // Show countdown
-            if (time === 0) {
-                startGame();
-                return;
-            }
-            setTimeout(() => updateCountdown(time - 1), 1000);
-        }
+  function animateRing() {
+    ringX += (mouseX - ringX) * 0.12;
+    ringY += (mouseY - ringY) * 0.12;
+    ring.style.left = ringX + 'px';
+    ring.style.top = ringY + 'px';
+    requestAnimationFrame(animateRing);
+  }
+  animateRing();
 
-        function startCountdown() {
-            startReminder.style.display = 'none'; // Hide start reminder when countdown starts
-            updateCountdown(3); // Start 3-second countdown
-        }
-
-        controls.forEach((button, index) => {
-            button.addEventListener('click', () => {
-                const directions = ['up', 'left', 'down', 'right'];
-                if (directions.includes(button.id)) {
-                    const newDirection = {'up': {x: 0, y: -20}, 'left': {x: -20, y: 0}, 'down': {x: 0, y: 20}, 'right': {x: 20, y: 0}}[button.id];
-                    if (newDirection.x !== -direction.x || newDirection.y !== -direction.y) {
-                        direction = newDirection;
-                    }
-                }
-            });
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        // Stagger children if any
+        const children = entry.target.querySelectorAll('.work-item');
+        children.forEach((child, i) => {
+          child.style.transitionDelay = (i * 0.08) + 's';
+          child.classList.add('visible');
         });
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
 
-        document.addEventListener('keydown', (e) => {
-            switch (e.key) {
-                case 'ArrowUp':
-                    if (direction.y === 0) direction = { x: 0, y: -20 };
-                    break;
-                case 'ArrowDown':
-                    if (direction.y === 0) direction = { x: 0, y: 20 };
-                    break;
-                case 'ArrowLeft':
-                    if (direction.x === 0) direction = { x: -20, y: 0 };
-                    break;
-                case 'ArrowRight':
-                    if (direction.x === 0) direction = { x: 20, y: 0 };
-                    break;
-            }
-        });
+  reveals.forEach(el => observer.observe(el));
 
-        function endGame() {
-            clearInterval(intervalId);
-            finalScore.textContent = score;
-            if (score < 100) {
-                gameOverDialog.style.display = 'block'; // Show game over dialog if score is less than 100
-            } else {
-                document.getElementById('screen5').style.display = 'none'; // Hide current screen
-                document.getElementById('screen6').style.display = 'flex'; // Show next screen
-            }
-            countdownElement.style.display = 'none'; // Hide countdown after game ends
-        }
-
-        function restartGame() {
-            gameOverDialog.style.display = 'none'; // Hide game over dialog
-            location.reload();
-        }
-    </script>
+  // Nav transparency on scroll
+  const nav = document.querySelector('nav');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 60) {
+      nav.style.background = 'rgba(242,237,228,0.92)';
+      nav.style.backdropFilter = 'blur(12px)';
+      nav.style.mixBlendMode = 'normal';
+    } else {
+      nav.style.background = 'transparent';
+      nav.style.backdropFilter = 'none';
+      nav.style.mixBlendMode = 'multiply';
+    }
+  });
+</script>
 </body>
 </html>
